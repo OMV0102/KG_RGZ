@@ -4,9 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace KG_RGZ {
-    public class Spline {
-        private char[] _spl = {' ', '\n', '\r', '\t'}; // separators
+namespace KG_RGZ
+{
+    public class Spline
+    {
         private List<SplineFunction> sp;
         private List<PointF> _points;
         private List<PointF> _pointsView;
@@ -15,7 +16,8 @@ namespace KG_RGZ {
 
         private int _steps = 10;
 
-        public int Steps {
+        public int Steps
+        {
             get { return _steps; }
             set { _steps = Math.Abs(value); ApplyChanges(); }
         }
@@ -47,7 +49,7 @@ namespace KG_RGZ {
                 PointF pt;
                 while (!f.EndOfStream) {
                     string str = f.ReadLine();
-                    string[] data = str.Split(_spl, StringSplitOptions.RemoveEmptyEntries);
+                    string[] data = str.Split(new char[] { ' ', '\n', '\r', '\t'}, StringSplitOptions.RemoveEmptyEntries);
                     float x = float.Parse(data[0]);
                     float y = float.Parse(data[1]);
 
@@ -196,14 +198,17 @@ namespace KG_RGZ {
             return an;
         }
 
-        private void ApplyChanges() {
-            if (_points.Count < 2) return;
-            _points.Sort((x,y) => x.X.CompareTo(y.X));
-            //sp.Sort((x,y) => x.X.CompareTo(y.X));
-            CreateSF();
-            CountC();
-            CountBAD();
-            CalculatePoints();
+        private void ApplyChanges()
+        {
+            if (_points.Count > 1)
+            {
+                _points.Sort((x, y) => x.X.CompareTo(y.X));
+                //sp.Sort((x,y) => x.X.CompareTo(y.X));
+                CreateSF();
+                CountC();
+                CountBAD();
+                CalculatePoints();
+            }
         }
 
         private static int SortByX(PointF p1, PointF p2) {

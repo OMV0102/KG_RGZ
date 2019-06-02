@@ -3,14 +3,14 @@ using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace KG_RGZ {
-    public class Renderer {
+namespace KG_RGZ
+{
+    public class Renderer
+    {
         private GLControl _g;
         private Color BackgroundColor = Color.White;
         private Color GridColor = Color.DarkGray;
         private Color Graph1Color = Color.Red;
-        private Color Graph2Color = Color.LimeGreen;
-        private Color Graph3Color = Color.Blue;
         private Color Point1Color = Color.Black;
 
         public readonly float ZoomIn = 1.2f;
@@ -18,12 +18,6 @@ namespace KG_RGZ {
 
         private int CellSize = 1;
         private int xl, yl;
-        private int _drawMode = 1;
-
-        public int DrawMode {
-            get { return _drawMode; }
-            set { _drawMode = value; }
-        }
 
         private int xm { get { return xl + _g.Width; } }
         private int ym { get { return yl + _g.Height; } }
@@ -32,7 +26,8 @@ namespace KG_RGZ {
         public float TranslateX = 0;
         public float TranslateY = 0;
 
-        public Renderer(GLControl g) {
+        public Renderer(GLControl g)
+        {
             this._g = g;
             xl = -_g.Width / 2;
             yl = -_g.Height / 2;
@@ -41,7 +36,8 @@ namespace KG_RGZ {
             TranslateY = -_g.Height / 2 / Scale;
         }
 
-        public void Initialize() {
+        public void Initialize()
+        {
             // Настройка OpenGL
             GL.ClearColor(BackgroundColor); // установить цвет фона области
 
@@ -58,29 +54,30 @@ namespace KG_RGZ {
             // Конец настройки OpenGL
         }
 
-        public void ApplyResize() {
-            Initialize();
-        }
-
-        public void Refresh() {
+        public void Refresh()
+        {
             _g.Invalidate();
         }
 
-        public void ScaleIn(int delta = 1) {
+        public void ScaleIn(int delta = 1)
+        {
             Scale *= (float)Math.Pow(ZoomIn, delta);
         }
 
-        public void ScaleOut(int delta = 1) {
+        public void ScaleOut(int delta = 1)
+        {
             if (Scale <= 2) return;
             Scale *= (float)Math.Pow(ZoomOut, delta);
         }
 
-        public void Move(int dx, int dy) {
+        public void Move(int dx, int dy)
+        {
             TranslateX -= (float) dx / Scale;
             TranslateY += (float) dy / Scale;
         }
 
-        public void Begin() {
+        public void Begin()
+        {
             // ColorBuffer - буфер цвета. 
             //     С каждым пикселем на экране связано значение цвета, которое записывается в буфере цвета.
             // DepthBuffer - буфер глубины. 
@@ -92,14 +89,16 @@ namespace KG_RGZ {
             GL.Translate(TranslateX, TranslateY, 0);
         }
 
-        public void End() {
+        public void End()
+        {
             //GL.PopMatrix();
         }
 
         /// <summary>
         /// Рисование координатной сетки.
         /// </summary>
-        public void DrawGrid() {
+        public void DrawGrid()
+        {
             // задаем ширину линии
             GL.LineWidth(1);
             // устанавливаем цвет
@@ -107,11 +106,13 @@ namespace KG_RGZ {
             // начинаем рисовать
             GL.Begin(PrimitiveType.Lines);
             // расставляем точки и рисуем линии
-            for (int i = xl - xl % CellSize; i < xm + xm % CellSize; i += CellSize) { // вертикальные
+            for (int i = xl - xl % CellSize; i < xm + xm % CellSize; i += CellSize)
+            { // вертикальные
                 GL.Vertex2(i, yl);
                 GL.Vertex2(i, ym);
             }
-            for (int i = yl - yl % CellSize; i < ym + ym % CellSize; i += CellSize) { // горизонтальные
+            for (int i = yl - yl % CellSize; i < ym + ym % CellSize; i += CellSize)
+            { // горизонтальные
                 GL.Vertex2(xl, i);
                 GL.Vertex2(xm, i);
             }
@@ -119,7 +120,8 @@ namespace KG_RGZ {
             GL.End();
         }
 
-        public void DrawAxis() {
+        public void DrawAxis()
+        {
             GL.LineWidth(3);
             GL.Color3(GridColor);
             GL.Begin(PrimitiveType.Lines);
@@ -132,40 +134,24 @@ namespace KG_RGZ {
             GL.End();
         }
 
-        public void DrawSpline(Spline s) {
+        public void DrawSpline(Spline s)
+        {
             GL.LineWidth(2);
-            if ((_drawMode & (1 << 0)) != 0) {
-                GL.Color3(Graph1Color);
-                GL.Begin(PrimitiveType.LineStrip);
-                foreach (var pt in s.PointsView) {
-                    GL.Vertex2(pt.X, pt.Y);
-                }
-                GL.End();
+            GL.Color3(Graph1Color);
+            GL.Begin(PrimitiveType.LineStrip);
+            foreach (var pt in s.PointsView)
+            {
+                GL.Vertex2(pt.X, pt.Y);
             }
-
-            if ((_drawMode & (1 << 1)) != 0) {
-                GL.Color3(Graph2Color);
-                GL.Begin(PrimitiveType.LineStrip);
-                foreach (var pt in s.d_points) {
-                    GL.Vertex2(pt.X, pt.Y);
-                }
-                GL.End();
-            }
-
-            if((_drawMode & (1 << 2)) != 0) {
-                GL.Color3(Graph3Color);
-                GL.Begin(PrimitiveType.LineStrip);
-                foreach (var pt in s.i_points) {
-                    GL.Vertex2(pt.X, pt.Y);
-                }
-                GL.End();
-            }
+            GL.End();
         }
 
-        public void DrawPoints(Spline s) {
+        public void DrawPoints(Spline s)
+        {
             GL.Color3(Point1Color);
             GL.Begin(PrimitiveType.Quads);
-            foreach (var pt in s.Points) {
+            foreach (var pt in s.Points)
+            {
                 GL.Vertex2(pt.X - 0.1, pt.Y + 0.1);
                 GL.Vertex2(pt.X - 0.1, pt.Y - 0.1);
                 GL.Vertex2(pt.X + 0.1, pt.Y - 0.1);
